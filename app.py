@@ -3,7 +3,7 @@ from tensorflow.keras.models import load_model
 import tensorflow as tf
 import numpy as np
 
-model = load_model('C:\\Users\\HP\\Downloads\\khalid\\lungModel2.h5')
+model = load_model('lungModel2.h5')
 
 def preprocess_image(image):
     # Convert the image to a numpy array
