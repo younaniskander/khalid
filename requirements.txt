@@ -5,4 +5,4 @@ matplotlib==3.3.4
 scipy==1.13.0
 tensorflow==2.15.0
 Pillow==2.2.1 
-click==7.1.2
+click==8.0.0a1 
