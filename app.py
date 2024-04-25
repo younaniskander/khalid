@@ -14,16 +14,14 @@ def main():
     # File uploader
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
-    # Define IMG_SIZE within the main function
-    IMG_SIZE = 128
-
     if uploaded_file is not None:
         # Display the uploaded image
         image = Image.open(uploaded_file)
         st.image(image, caption='Uploaded Image', use_column_width=True)
 
-        # Resize the image
-        resized_image = image.resize((IMG_SIZE, IMG_SIZE))
+        # Resize the image to match the input shape expected by the model
+        IMG_SIZE = (192, 192)
+        resized_image = image.resize(IMG_SIZE)
 
         # Convert the resized image to array
         resized_image = np.array(resized_image) / 255.0
