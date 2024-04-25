@@ -3,6 +3,7 @@ from PIL import Image
 import tensorflow as tf
 import numpy as np
 import tensorflow.keras.applications.mobilenet as mobilenet
+from scipy import ndimage
 
 # Load the Keras model using TensorFlow's load_model method
 @st.cache(allow_output_mutation=True)
@@ -17,8 +18,12 @@ def preprocess_image(image):
     # Convert the resized image to array
     resized_image = np.array(resized_image)
 
+    # Sharpen the image for enhanced details
+    sharpened_image = ndimage.median_filter(resized_image, 3)
+    sharpened_image = resized_image + 0.8 * (resized_image - sharpened_image)
+
     # Preprocess the image using MobileNet's preprocess_input function
-    processed_image = mobilenet.preprocess_input(resized_image)
+    processed_image = mobilenet.preprocess_input(sharpened_image)
 
     # Expand dimensions to match model input shape
     processed_image = np.expand_dims(processed_image, axis=0)
@@ -64,9 +69,4 @@ def main():
         st.write('Prediction:', predicted_class)
 
         # Add a feedback section
-        feedback = st.text_area("Share your feedback", "")
-        if st.button("Submit Feedback"):
-            st.write("Thank you for your feedback:", feedback)
-
-if __name__ == "__main__":
-    main()
+        f
