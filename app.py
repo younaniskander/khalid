@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image
 import tensorflow as tf
 import numpy as np
+import tensorflow.keras.applications.mobilenet as mobilenet
 
 # Load the Keras model using TensorFlow's load_model method
 @st.cache(allow_output_mutation=True)
@@ -9,17 +10,20 @@ def load_keras_model(model_path):
     return tf.keras.models.load_model(model_path)
 
 def preprocess_image(image):
-    # Resize the image to match the input shape expected by the model
-    IMG_SIZE = (192, 192)
+    # Resize the image to match the input shape expected by MobileNet
+    IMG_SIZE = (224, 224)
     resized_image = image.resize(IMG_SIZE)
 
     # Convert the resized image to array
-    resized_image = np.array(resized_image) / 255.0
+    resized_image = np.array(resized_image)
+
+    # Preprocess the image using MobileNet's preprocess_input function
+    processed_image = mobilenet.preprocess_input(resized_image)
 
     # Expand dimensions to match model input shape
-    resized_image = np.expand_dims(resized_image, axis=0)
+    processed_image = np.expand_dims(processed_image, axis=0)
     
-    return resized_image
+    return processed_image
 
 def main():
     st.title('Lung Cancer Detection')
