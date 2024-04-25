@@ -24,6 +24,17 @@ def preprocess_image(image):
 
 def main():
     st.title('Lung Cancer Detection')
+    
+    # Add a login section
+    username = st.sidebar.text_input("Username")
+    password = st.sidebar.text_input("Password", type="password")
+    if st.sidebar.button("Login"):
+        if username == "admin" and password == "123":
+            st.sidebar.success("Logged in as {}".format(username))
+        else:
+            st.sidebar.error("Incorrect username or password")
+            st.stop()
+
     st.write('Upload an image of a lung for cancer detection')
 
     # File uploader
@@ -48,6 +59,11 @@ def main():
 
         # Display the result
         st.write('Prediction:', predicted_class)
+
+        # Add a feedback section
+        feedback = st.text_area("Share your feedback", "")
+        if st.button("Submit Feedback"):
+            st.write("Thank you for your feedback:", feedback)
 
 if __name__ == "__main__":
     main()
