@@ -14,15 +14,22 @@ def main():
     # File uploader
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
+    # Define IMG_SIZE within the main function
+    IMG_SIZE = 128
+
     if uploaded_file is not None:
         # Display the uploaded image
         image = Image.open(uploaded_file)
         st.image(image, caption='Uploaded Image', use_column_width=True)
 
-        # Resize and preprocess the image
+        # Resize the image
         resized_image = image.resize((IMG_SIZE, IMG_SIZE))
+
+        # Convert the resized image to array
         resized_image = np.array(resized_image) / 255.0
-        resized_image = resized_image.reshape(1, IMG_SIZE, IMG_SIZE, 3)
+
+        # Expand dimensions to match model input shape
+        resized_image = np.expand_dims(resized_image, axis=0)
 
         # Make predictions
         prediction = model.predict(resized_image)
