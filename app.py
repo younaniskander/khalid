@@ -1,9 +1,7 @@
 import streamlit as st
-from PIL import Image
+from PIL import ImageEnhance, Image
 import tensorflow as tf
 import numpy as np
-import tensorflow.keras.applications.mobilenet as mobilenet
-from scipy import ndimage
 
 # Load the Keras model using TensorFlow's load_model method
 @st.cache(allow_output_mutation=True)
@@ -11,24 +9,23 @@ def load_keras_model(model_path):
     return tf.keras.models.load_model(model_path)
 
 def preprocess_image(image):
-    # Resize the image to match the input shape expected by MobileNet
+    # Resize the image to match the input shape expected by the model
     IMG_SIZE = (224, 224)
     resized_image = image.resize(IMG_SIZE)
 
-    # Convert the resized image to array
-    resized_image = np.array(resized_image)
+    # Enhance the sharpness of the image
+    enhanced_image = ImageEnhance.Sharpness(resized_image).enhance(2.0)
 
-    # Sharpen the image for enhanced details
-    sharpened_image = ndimage.median_filter(resized_image, 3)
-    sharpened_image = resized_image + 0.8 * (resized_image - sharpened_image)
+    # Convert the enhanced image to array
+    resized_image = np.array(enhanced_image)
 
-    # Preprocess the image using MobileNet's preprocess_input function
-    processed_image = mobilenet.preprocess_input(sharpened_image)
+    # Normalize pixel values to be between 0 and 1
+    resized_image = resized_image / 255.0
 
     # Expand dimensions to match model input shape
-    processed_image = np.expand_dims(processed_image, axis=0)
+    resized_image = np.expand_dims(resized_image, axis=0)
     
-    return processed_image
+    return resized_image
 
 def main():
     st.title('Lung Cancer Detection')
@@ -69,4 +66,9 @@ def main():
         st.write('Prediction:', predicted_class)
 
         # Add a feedback section
-        f
+        feedback = st.text_area("Share your feedback", "")
+        if st.button("Submit Feedback"):
+            st.write("Thank you for your feedback:", feedback)
+
+if __name__ == "__main__":
+    main()
