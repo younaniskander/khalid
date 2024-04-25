@@ -1,8 +1,10 @@
 import streamlit as st
+from PIL import Image
 from tensorflow.keras.models import load_model
 import tensorflow as tf
 import numpy as np
 
+# Load the Keras model
 model = load_model('lungModel2.h5')
 
 def preprocess_image(image):
@@ -44,10 +46,12 @@ def main():
         processed_image = preprocess_image(image)
 
         # Make predictions
-        prediction = model.predict(augmented_image)
+        prediction = model.predict(processed_image)
         classes = ['normal', 'adenocarcinoma', 'large.cell', 'squamous']
         predicted_class = classes[np.argmax(prediction)]
 
         # Display the result
         st.write('Prediction:', predicted_class)
 
+if __name__ == "__main__":
+    main()
