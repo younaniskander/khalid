@@ -1,13 +1,12 @@
 import streamlit as st
 from PIL import Image
-from tensorflow.keras.models import load_model
 import tensorflow as tf
 import numpy as np
 
-# Load the Keras model
+# Load the Keras model using TensorFlow's load_model method
 @st.cache(allow_output_mutation=True)
 def load_keras_model(model_path):
-    return load_model(model_path)
+    return tf.keras.models.load_model(model_path)
 
 def preprocess_image(image):
     # Resize the image to match the input shape expected by the model
