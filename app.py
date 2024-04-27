@@ -1,86 +1,90 @@
-import numpy as np
 import streamlit as st
 import tensorflow as tf
 from PIL import Image
+import numpy as np
+
+# Dummy user database
+users = {
+    "admin": "password123",
+    "user": "testpass"
+}
 
 def apply_sharpening(image_array, alpha=0.5):
-    """
-    Manually apply a sharpening filter to the image.
-    `alpha` is the intensity of the sharpening.
-    """
-    # Define a sharpening kernel
     kernel = np.array([
         [-1, -1, -1],
         [-1, 9 + alpha, -1],
         [-1, -1, -1]
     ])
-
-    # Padding the image to maintain dimensions
-    pad_width = ((1, 1), (1, 1), (0, 0))  # Pad the spatial dimensions but not the channels
+    pad_width = ((1, 1), (1, 1), (0, 0))
     image_padded = np.pad(image_array, pad_width, mode='constant', constant_values=0)
-
-    # Image dimensions
     height, width, channels = image_padded.shape
-    # Prepare an empty array for the output
     sharpened_image = np.zeros_like(image_array)
-
-    # Apply the kernel to each pixel
     for y in range(1, height-1):
         for x in range(1, width-1):
             for c in range(channels):
                 region = image_padded[y-1:y+2, x-1:x+2, c]
                 sharpened_value = np.sum(region * kernel)
                 sharpened_image[y-1, x-1, c] = np.clip(sharpened_value, 0, 255)
-
     return sharpened_image
 
 def preprocess_image(image, IMG_SIZE=(192, 192)):
-    """
-    Preprocess the image: resize, sharpen, and normalize.
-    """
-    # Resize the image to match the input shape expected by the model
     image = image.resize(IMG_SIZE)
-
-    # Convert the image to a numpy array
     image_array = np.array(image)
-
-    # Manually sharpen the image
     sharpened_image = apply_sharpening(image_array)
-
-    # Normalize pixel values to be between 0 and 1
     normalized_image = sharpened_image / 255.0
-
-    # Expand dimensions to match model input shape
     processed_image = np.expand_dims(normalized_image, axis=0)
-    
-    return processed_image, sharpened_image
+    return processed_image
 
-def main():
-    st.title('Lung Cancer Detection')
+def login_page():
+    st.title("Login Page")
+    username = st.sidebar.text_input("Username")
+    password = st.sidebar.text_input("Password", type="password")
 
-    # Add the image uploader
+    if st.sidebar.button("Login"):
+        if username in users and users[username] == password:
+            st.session_state['user'] = username
+            st.session_state['page'] = 'model'
+        else:
+            st.error("Invalid username or password")
+
+def model_page():
+    st.title("Lung Cancer Detection")
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
-        st.image(image, caption='Original Image', use_column_width=True)
-
-        # Preprocess the image
-        processed_image, sharpened_image = preprocess_image(image)
-
-        # Display the processed image
-        display_image = Image.fromarray(sharpened_image.astype(np.uint8))
-        st.image(display_image, caption='Processed Image', use_column_width=True)
-
-        # Load the Keras model
+        st.image(image, caption='Uploaded Image', use_column_width=True)
+        processed_image = preprocess_image(image)
+        st.image(processed_image[0], caption='Processed Image', use_column_width=True)
         model_path = 'lungModel2.h5'
         model = tf.keras.models.load_model(model_path)
-
-        # Make predictions
         prediction = model.predict(processed_image)
-        classes = ['normal', 'adenocarcinoma', 'large.cell', 'squamous.cell']
+        classes = ['normal', 'adenocarcinoma', 'large.cell', 'squamous']
         predicted_class = classes[np.argmax(prediction)]
-
         st.write('Prediction:', predicted_class)
+        if st.button("Provide Feedback"):
+            st.session_state['page'] = 'feedback'
+
+def feedback_page():
+    st.title("Feedback")
+    feedback = st.text_area("How was your experience?")
+    if st.button("Submit Feedback"):
+        # Here you could write the feedback to a file or database
+        st.success("Thank you for your feedback!")
+        st.session_state['page'] = 'model'
+
+def main():
+    if 'page' not in st.session_state:
+        st.session_state['page'] = 'login'
+
+    if 'user' not in st.session_state:
+        st.session_state['user'] = None
+
+    if st.session_state['page'] == 'login':
+        login_page()
+    elif st.session_state['page'] == 'model':
+        model_page()
+    elif st.session_state['page'] == 'feedback':
+        feedback_page()
 
 if __name__ == "__main__":
     main()
