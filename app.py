@@ -9,7 +9,7 @@ users = {
     "user": "testpass"
 }
 
-def apply_sharpening(image_array, alpha=0.5):
+def apply_sharpening(image_array, alpha=0.3):
     kernel = np.array([
         [-1, -1, -1],
         [-1, 9 + alpha, -1],
