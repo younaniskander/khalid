@@ -78,11 +78,16 @@ def data_analysis_page():
     gender = st.radio("Gender", ("Male", "Female"))
     age = st.number_input("Age", min_value=0, max_value=150, value=30)
     smoking_status = st.selectbox("Do you smoke?", ("Yes", "No"))
+    
+    # Save user inputs in a table
+    user_data = {
+        "Name": name,
+        "Gender": gender,
+        "Age": age,
+        "Smoking Status": smoking_status
+    }
     st.write("You have provided the following information:")
-    st.write("Name:", name)
-    st.write("Gender:", gender)
-    st.write("Age:", age)
-    st.write("Smoking Status:", smoking_status)
+    st.table(user_data)
 
 def main():
     if 'page' not in st.session_state:
