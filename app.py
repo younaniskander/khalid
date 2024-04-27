@@ -3,7 +3,7 @@ import streamlit as st
 import tensorflow as tf
 from PIL import Image
 
-def apply_sharpening(image_array, alpha=1.5):
+def apply_sharpening(image_array, alpha=0.5):
     """
     Manually apply a sharpening filter to the image.
     `alpha` is the intensity of the sharpening.
