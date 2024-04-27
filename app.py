@@ -66,6 +66,12 @@ def model_page():
 def feedback_page():
     st.title("Feedback")
     feedback = st.text_area("How was your experience?")
+    
+    # Display user data table
+    st.write("You provided the following information:")
+    user_data = st.session_state.get('user_data', {})
+    st.table(user_data)
+
     if st.button("Submit Feedback"):
         # Here you could write the feedback to a file or database
         st.success("Thank you for your feedback!")
@@ -86,7 +92,10 @@ def data_analysis_page():
         "Age": age,
         "Smoking Status": smoking_status
     }
-    st.write("You have provided the following information:")
+    st.session_state['user_data'] = user_data
+    
+    # Display user data table
+    st.write("You provided the following information:")
     st.table(user_data)
 
 def main():
