@@ -2,6 +2,7 @@ import streamlit as st
 import tensorflow as tf
 from PIL import Image
 import numpy as np
+import base64
 import io
 
 # Dummy user database
@@ -94,10 +95,8 @@ def main():
     elif st.session_state['page'] == 'feedback':
         feedback_page()
 
-def get_binary_file_downloader_html(bin_file, file_label='File', button_text='Download'):
-    with open(bin_file, 'rb') as f:
-        data = f.read()
-    bin_str = base64.b64encode(data).decode()
+def get_binary_file_downloader_html(bin_data, file_label='File', button_text='Download'):
+    bin_str = base64.b64encode(bin_data.getvalue()).decode()
     href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{file_label}.jpg">{button_text}</a>'
     return href
 
