@@ -4,6 +4,7 @@ from PIL import Image
 import numpy as np
 import base64
 import io
+import pandas as pd
 
 # Dummy user database
 users = {
@@ -78,7 +79,8 @@ def feedback_page():
     # Display user input data table from model page
     st.write("You provided the following information:")
     user_input_data = st.session_state.get('user_input_data', {})
-    st.table(user_input_data)
+    user_input_df = pd.DataFrame([user_input_data])  # Convert dictionary to DataFrame
+    st.table(user_input_df)
 
     if st.button("Submit Feedback"):
         # Here you could write the feedback to a file or database
@@ -106,3 +108,4 @@ def get_binary_file_downloader_html(bin_data, file_label='File', button_text='Do
 
 if __name__ == "__main__":
     main()
+
