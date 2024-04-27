@@ -39,6 +39,10 @@ def preprocess_image(image, IMG_SIZE=(192, 192)):
 
 def login_page():
     st.title("Login Page")
+
+    # Add image
+    st.image("happy.png", caption='Your Image Caption', use_column_width=True)
+    
     username = st.sidebar.text_input("Username")
     password = st.sidebar.text_input("Password", type="password")
 
