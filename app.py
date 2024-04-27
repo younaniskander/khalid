@@ -38,6 +38,11 @@ def model_page():
     st.title("Lung Cancer Detection")
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
+        name = st.text_input("Name", "")
+        gender = st.radio("Gender", ("Male", "Female"))
+        age = st.number_input("Age", min_value=0, max_value=150, value=30)
+        smoking_status = st.selectbox("Do you smoke?", ("Yes", "No"))
+
         image = Image.open(uploaded_file)
         st.image(image, caption='Original Image', use_column_width=True)
         processed_image = preprocess_image(image)
@@ -66,6 +71,19 @@ def feedback_page():
         st.success("Thank you for your feedback!")
         st.session_state['page'] = 'login'
 
+def data_analysis_page():
+    st.title("Data Analysis")
+    st.write("Please provide your information for data analysis:")
+    name = st.text_input("Name", "")
+    gender = st.radio("Gender", ("Male", "Female"))
+    age = st.number_input("Age", min_value=0, max_value=150, value=30)
+    smoking_status = st.selectbox("Do you smoke?", ("Yes", "No"))
+    st.write("You have provided the following information:")
+    st.write("Name:", name)
+    st.write("Gender:", gender)
+    st.write("Age:", age)
+    st.write("Smoking Status:", smoking_status)
+
 def main():
     if 'page' not in st.session_state:
         st.session_state['page'] = 'login'
@@ -79,6 +97,8 @@ def main():
         model_page()
     elif st.session_state['page'] == 'feedback':
         feedback_page()
+    elif st.session_state['page'] == 'data_analysis':
+        data_analysis_page()
 
 def get_binary_file_downloader_html(bin_data, file_label='File', button_text='Download'):
     bin_str = base64.b64encode(bin_data.getvalue()).decode()
