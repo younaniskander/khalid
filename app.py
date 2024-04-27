@@ -2,6 +2,7 @@ import streamlit as st
 import tensorflow as tf
 from PIL import Image
 import numpy as np
+import io
 
 # Dummy user database
 users = {
@@ -9,7 +10,7 @@ users = {
     "user": "testpass"
 }
 
-def apply_sharpening(image_array, alpha=0.3):
+def apply_sharpening(image_array, alpha=0.5):
     kernel = np.array([
         [-1, -1, -1],
         [-1, 9 + alpha, -1],
@@ -61,6 +62,13 @@ def model_page():
         classes = ['normal', 'adenocarcinoma', 'large.cell', 'squamous']
         predicted_class = classes[np.argmax(prediction)]
         st.write('Prediction:', predicted_class)
+
+        # Download the processed image
+        buffer = io.BytesIO()
+        image.save(buffer, format="JPEG")
+        buffer.seek(0)
+        st.markdown(get_binary_file_downloader_html(buffer, 'Processed_Image', 'Download Processed Image'), unsafe_allow_html=True)
+
         if st.button("Provide Feedback"):
             st.session_state['page'] = 'feedback'
 
@@ -70,7 +78,7 @@ def feedback_page():
     if st.button("Submit Feedback"):
         # Here you could write the feedback to a file or database
         st.success("Thank you for your feedback!")
-        st.session_state['page'] = 'model'
+        st.session_state['page'] = 'login'
 
 def main():
     if 'page' not in st.session_state:
@@ -85,6 +93,13 @@ def main():
         model_page()
     elif st.session_state['page'] == 'feedback':
         feedback_page()
+
+def get_binary_file_downloader_html(bin_file, file_label='File', button_text='Download'):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    bin_str = base64.b64encode(data).decode()
+    href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{file_label}.jpg">{button_text}</a>'
+    return href
 
 if __name__ == "__main__":
     main()
