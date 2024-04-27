@@ -7,7 +7,7 @@ from streamlit_for_flutter import build_api
 # Load the AI model
 @st.cache(allow_output_mutation=True)
 def load_model():
-    model = tf.keras.models.load_model('path_to_your_model.h5')
+    model = tf.keras.models.load_model('lung_model2.h5')
     return model
 
 model = load_model()
