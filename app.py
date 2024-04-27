@@ -1,6 +1,7 @@
 import numpy as np
 import streamlit as st
 import tensorflow as tf
+from PIL import Image
 
 def apply_sharpening(image_array, alpha=1.5):
     """
@@ -27,7 +28,6 @@ def apply_sharpening(image_array, alpha=1.5):
     for y in range(1, height-1):
         for x in range(1, width-1):
             for c in range(channels):
-                # Element-wise multiplication of the kernel and the pixel matrix
                 region = image_padded[y-1:y+2, x-1:x+2, c]
                 sharpened_value = np.sum(region * kernel)
                 sharpened_image[y-1, x-1, c] = np.clip(sharpened_value, 0, 255)
@@ -53,7 +53,7 @@ def preprocess_image(image, IMG_SIZE=(192, 192)):
     # Expand dimensions to match model input shape
     processed_image = np.expand_dims(normalized_image, axis=0)
     
-    return processed_image
+    return processed_image, sharpened_image
 
 def main():
     st.title('Lung Cancer Detection')
@@ -61,15 +61,15 @@ def main():
     # Add the image uploader
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
-        from PIL import Image
         image = Image.open(uploaded_file)
-        st.image(image, caption='Uploaded Image', use_column_width=True)
+        st.image(image, caption='Original Image', use_column_width=True)
 
         # Preprocess the image
-        processed_image = preprocess_image(image)
+        processed_image, sharpened_image = preprocess_image(image)
 
-        # Display the processed image (if needed for debugging)
-        # st.image(processed_image[0], caption='Processed Image', use_column_width=True)
+        # Display the processed image
+        display_image = Image.fromarray(sharpened_image.astype(np.uint8))
+        st.image(display_image, caption='Processed Image', use_column_width=True)
 
         # Load the Keras model
         model_path = 'lungModel2.h5'
@@ -77,11 +77,10 @@ def main():
 
         # Make predictions
         prediction = model.predict(processed_image)
-        classes = ['normal', 'adenocarcinoma', 'large.cell', 'squamous']
+        classes = ['normal', 'adenocarcinoma', 'large.cell', 'squamous.cell']
         predicted_class = classes[np.argmax(prediction)]
 
         st.write('Prediction:', predicted_class)
 
 if __name__ == "__main__":
     main()
-
