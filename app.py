@@ -11,35 +11,16 @@ users = {
     "user": "testpass"
 }
 
-def apply_sharpening(image_array, alpha=0.2):
-    kernel = np.array([
-        [-1, -1, -1],
-        [-1, 9 + alpha, -1],
-        [-1, -1, -1]
-    ])
-    pad_width = ((1, 1), (1, 1), (0, 0))
-    image_padded = np.pad(image_array, pad_width, mode='constant', constant_values=0)
-    height, width, channels = image_padded.shape
-    sharpened_image = np.zeros_like(image_array)
-    for y in range(1, height-1):
-        for x in range(1, width-1):
-            for c in range(channels):
-                region = image_padded[y-1:y+2, x-1:x+2, c]
-                sharpened_value = np.sum(region * kernel)
-                sharpened_image[y-1, x-1, c] = np.clip(sharpened_value, 0, 255)
-    return sharpened_image
-
 def preprocess_image(image, IMG_SIZE=(192, 192)):
     image = image.resize(IMG_SIZE)
     image_array = np.array(image)
-    sharpened_image = apply_sharpening(image_array)
-    normalized_image = sharpened_image / 255.0
+    normalized_image = image_array / 255.0
     processed_image = np.expand_dims(normalized_image, axis=0)
     return processed_image
 
 def login_page():
     st.title("Login Page")
-
+    
     # Add image
     st.image("happy.jfif", caption='Your Image Caption', use_column_width=True)
     
@@ -58,7 +39,7 @@ def model_page():
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
-        st.image(image, caption='Uploaded Image', use_column_width=True)
+        st.image(image, caption='Original Image', use_column_width=True)
         processed_image = preprocess_image(image)
         st.image(processed_image[0], caption='Processed Image', use_column_width=True)
         model_path = 'lungModel2.h5'
