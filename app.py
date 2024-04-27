@@ -34,7 +34,7 @@ def apply_sharpening(image_array, alpha=1.5):
 
     return sharpened_image
 
-def preprocess_image(image, IMG_SIZE=(224, 224)):
+def preprocess_image(image, IMG_SIZE=(192, 192)):
     """
     Preprocess the image: resize, sharpen, and normalize.
     """
