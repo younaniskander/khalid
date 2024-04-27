@@ -11,7 +11,7 @@ users = {
     "user": "testpass"
 }
 
-def apply_sharpening(image_array, alpha=0.5):
+def apply_sharpening(image_array, alpha=0.2):
     kernel = np.array([
         [-1, -1, -1],
         [-1, 9 + alpha, -1],
@@ -41,7 +41,7 @@ def login_page():
     st.title("Login Page")
 
     # Add image
-    st.image("happy.png", caption='Your Image Caption', use_column_width=True)
+    st.image("happy.jfif", caption='Your Image Caption', use_column_width=True)
     
     username = st.sidebar.text_input("Username")
     password = st.sidebar.text_input("Password", type="password")
