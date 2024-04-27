@@ -54,6 +54,14 @@ def model_page():
         predicted_class = classes[np.argmax(prediction)]
         st.write('Prediction:', predicted_class)
 
+        # Store user input data in session state
+        st.session_state['user_input_data'] = {
+            "Name": name,
+            "Gender": gender,
+            "Age": age,
+            "Smoking Status": smoking_status
+        }
+
         # Download the processed image
         buffer = io.BytesIO()
         image.save(buffer, format="JPEG")
@@ -67,36 +75,15 @@ def feedback_page():
     st.title("Feedback")
     feedback = st.text_area("How was your experience?")
     
-    # Display user data table
+    # Display user input data table from model page
     st.write("You provided the following information:")
-    user_data = st.session_state.get('user_data', {})
-    st.table(user_data)
+    user_input_data = st.session_state.get('user_input_data', {})
+    st.table(user_input_data)
 
     if st.button("Submit Feedback"):
         # Here you could write the feedback to a file or database
         st.success("Thank you for your feedback!")
         st.session_state['page'] = 'login'
-
-def data_analysis_page():
-    st.title("Data Analysis")
-    st.write("Please provide your information for data analysis:")
-    name = st.text_input("Name", "")
-    gender = st.radio("Gender", ("Male", "Female"))
-    age = st.number_input("Age", min_value=0, max_value=150, value=30)
-    smoking_status = st.selectbox("Do you smoke?", ("Yes", "No"))
-    
-    # Save user inputs in a table
-    user_data = {
-        "Name": name,
-        "Gender": gender,
-        "Age": age,
-        "Smoking Status": smoking_status
-    }
-    st.session_state['user_data'] = user_data
-    
-    # Display user data table
-    st.write("You provided the following information:")
-    st.table(user_data)
 
 def main():
     if 'page' not in st.session_state:
@@ -111,8 +98,6 @@ def main():
         model_page()
     elif st.session_state['page'] == 'feedback':
         feedback_page()
-    elif st.session_state['page'] == 'data_analysis':
-        data_analysis_page()
 
 def get_binary_file_downloader_html(bin_data, file_label='File', button_text='Download'):
     bin_str = base64.b64encode(bin_data.getvalue()).decode()
